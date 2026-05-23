@@ -1,27 +1,21 @@
-version: '3.8'
+version: "3.8"
 
 services:
   nginx:
-    build:
-      context: .
-      dockerfile: Dockerfile.nginx
+    build: .                           # <--- Tell Coolify to build the Dockerfile
     container_name: tvtracker-nginx
     ports:
       - "80:80"
-    volumes:
-      - ./index.html:/usr/share/nginx/html/index.html:ro
-      - ./help.html:/usr/share/nginx/html/help.html:ro
-      - ./css:/usr/share/nginx/html/css:ro
-      - ./js:/usr/share/nginx/html/js:ro
+    # Notice the volumes section is gone from Nginx
     restart: unless-stopped
     depends_on:
       - pocketbase
 
   pocketbase:
-    image: ghcr.io/muchobien/pocketbase:latest
+    image: pocketbase/pocketbase:latest
     container_name: tvtracker-pb
     volumes:
-      - ./pb_data:/pb_data
+      - ./pb_data:/pb_data             # <--- Keep this! Docker creating a directory here is exactly what you want for the database.
     environment:
-      - PB_ENCRYPTION_KEY=your-32-char-random-string-123   # change this!
+      - PB_ENCRYPTION_KEY=your-32-char-random-string-123 # change this!
     restart: unless-stopped
