@@ -6,11 +6,11 @@ services:
       context: .
       dockerfile: Dockerfile.nginx
     container_name: tvtracker-nginx
-    ports:
-      - "8080:80"          # ← changed to avoid port conflict
     restart: unless-stopped
     depends_on:
       - pocketbase
+    networks:
+      - coolify
 
   pocketbase:
     image: ghcr.io/muchobien/pocketbase:latest
@@ -20,3 +20,9 @@ services:
     environment:
       - PB_ENCRYPTION_KEY=your-32-char-random-string-123
     restart: unless-stopped
+    networks:
+      - coolify
+
+networks:
+  coolify:
+    external: true
