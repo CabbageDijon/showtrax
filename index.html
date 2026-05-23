@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <title>TV Tracker Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body class="bg-slate-900 text-slate-100 font-sans antialiased pb-safe">
+    <!-- Sticky Navbar -->
+    <header
+      class="sticky top-0 z-50 bg-slate-800/95 backdrop-blur border-b border-slate-700 shadow-lg"
+    >
+      <div
+        class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between"
+      >
+        <!-- Logo -->
+        <div class="flex items-center gap-2">
+          <svg
+            class="w-8 h-8 text-indigo-400"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"
+            />
+          </svg>
+          <span class="text-xl font-bold tracking-tight text-white"
+            >TV<span class="text-indigo-400">Tracker</span> Pro</span
+          >
+        </div>
+
+        <!-- Desktop Navigation -->
+        <nav class="hidden md:flex items-center gap-1">
+          <button
+            data-view="dashboard"
+            class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-700 active:bg-slate-600"
+          >
+            My Tracker
+          </button>
+          <button
+            data-view="discover"
+            class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-700 active:bg-slate-600"
+          >
+            Discover
+          </button>
+          <button
+            data-view="docs"
+            class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-700 active:bg-slate-600"
+          >
+            Docs
+          </button>
+        </nav>
+
+        <!-- User menu + Mobile hamburger -->
+        <div class="flex items-center gap-3">
+          <button
+            id="user-menu-btn"
+            class="w-10 h-10 rounded-full bg-slate-700 hover:bg-slate-600 flex items-center justify-center focus:outline-none"
+            aria-label="User menu"
+          >
+            <svg
+              class="w-5 h-5 text-slate-300"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zM10 12a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 17a5.986 5.986 0 004.546-2.084A5 5 0 0010 12z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </button>
+          <button
+            id="hamburger-btn"
+            class="md:hidden w-10 h-10 rounded-lg bg-slate-700 hover:bg-slate-600 flex items-center justify-center focus:outline-none"
+            aria-label="Menu"
+          >
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <!-- Mobile Navigation Dropdown -->
+      <div
+        id="mobile-menu"
+        class="md:hidden hidden bg-slate-800 border-t border-slate-700 px-4 py-2 space-y-1"
+      >
+        <button
+          data-view="dashboard"
+          class="mobile-nav-btn block w-full text-left px-4 py-3 rounded-lg text-sm font-medium hover:bg-slate-700"
+        >
+          My Tracker
+        </button>
+        <button
+          data-view="discover"
+          class="mobile-nav-btn block w-full text-left px-4 py-3 rounded-lg text-sm font-medium hover:bg-slate-700"
+        >
+          Discover
+        </button>
+        <button
+          data-view="docs"
+          class="mobile-nav-btn block w-full text-left px-4 py-3 rounded-lg text-sm font-medium hover:bg-slate-700"
+        >
+          Docs
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Area with Views -->
+    <main class="max-w-7xl mx-auto px-4 py-6">
+      <!-- Dashboard View -->
+      <section id="dashboard-view" class="view hidden">
+        <!-- Alert Banner -->
+        <div id="alerts-container" class="mb-6"></div>
+        <h2 class="text-2xl font-bold mb-4">📺 Your Watchlist</h2>
+        <div id="watchlist-grid" class="shows-grid"></div>
+        <div
+          id="empty-watchlist"
+          class="hidden text-center py-16 text-slate-400"
+        >
+          <p class="text-xl">Your watchlist is empty.</p>
+          <p class="mt-2">
+            Head over to
+            <button data-view="discover" class="text-indigo-400 underline">
+              Discover
+            </button>
+            to add shows.
+          </p>
+        </div>
+
+        <!-- Recommendations -->
+        <h2 class="text-2xl font-bold mt-10 mb-4">✨ For You</h2>
+        <div
+          id="recommendations-scroll"
+          class="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory scrollbar-thin"
+        ></div>
+        <p id="rec-loading" class="text-slate-400 text-sm">
+          Loading recommendations...
+        </p>
+      </section>
+
+      <!-- Discover View -->
+      <section id="discover-view" class="view hidden">
+        <h2 class="text-2xl font-bold mb-6">🔍 Discover Shows</h2>
+        <div class="flex flex-col sm:flex-row gap-3 mb-8">
+          <input
+            id="search-input"
+            type="text"
+            placeholder="Search TV shows..."
+            class="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            autocomplete="off"
+          />
+          <button
+            id="search-btn"
+            class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-3 rounded-lg transition"
+          >
+            Search
+          </button>
+        </div>
+        <div id="search-results-grid" class="shows-grid"></div>
+        <p id="search-status" class="text-slate-400 mt-4"></p>
+      </section>
+
+      <!-- Docs View (iframe) -->
+      <section
+        id="docs-view"
+        class="view hidden relative w-full"
+        style="height: calc(100vh - 8rem)"
+      >
+        <iframe
+          src="/help.html"
+          class="w-full h-full border-0 rounded-xl bg-slate-800"
+        ></iframe>
+      </section>
+    </main>
+
+    <!-- Show Detail Modal -->
+    <div id="show-modal" class="modal-container hidden">
+      <div class="modal-content">
+        <button
+          id="close-modal"
+          class="absolute top-4 right-4 w-10 h-10 rounded-full bg-slate-700/80 hover:bg-slate-600 flex items-center justify-center z-10"
+          aria-label="Close"
+        >
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+        <div
+          id="modal-body"
+          class="p-6 overflow-y-auto max-h-[90vh] md:max-h-[80vh]"
+        ></div>
+      </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="modal-container hidden">
+      <div class="modal-content w-11/12 max-w-md">
+        <div id="auth-forms" class="p-6">
+          <!-- Sign In Form -->
+          <form id="signin-form" class="space-y-4">
+            <h3 class="text-xl font-bold mb-4">Sign In</h3>
+            <input
+              type="text"
+              name="username"
+              placeholder="Username"
+              required
+              class="w-full bg-slate-800 border border-slate-700 rounded px-4 py-2"
+            />
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              required
+              class="w-full bg-slate-800 border border-slate-700 rounded px-4 py-2"
+            />
+            <button
+              type="submit"
+              class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded"
+            >
+              Sign In
+            </button>
+            <p class="text-sm text-slate-400 text-center">
+              Don't have an account?
+              <button
+                type="button"
+                id="show-signup"
+                class="text-indigo-400 underline"
+              >
+                Sign Up
+              </button>
+            </p>
+          </form>
+          <!-- Sign Up Form (hidden by default) -->
+          <form id="signup-form" class="space-y-4 hidden">
+            <h3 class="text-xl font-bold mb-4">Create Account</h3>
+            <input
+              type="text"
+              name="username"
+              placeholder="Username"
+              required
+              class="w-full bg-slate-800 border border-slate-700 rounded px-4 py-2"
+            />
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              required
+              class="w-full bg-slate-800 border border-slate-700 rounded px-4 py-2"
+            />
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              required
+              class="w-full bg-slate-800 border border-slate-700 rounded px-4 py-2"
+            />
+            <button
+              type="submit"
+              class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded"
+            >
+              Sign Up
+            </button>
+            <p class="text-sm text-slate-400 text-center">
+              Already have an account?
+              <button
+                type="button"
+                id="show-signin"
+                class="text-indigo-400 underline"
+              >
+                Sign In
+              </button>
+            </p>
+          </form>
+          <div class="mt-6 text-center">
+            <button
+              id="guest-login-btn"
+              class="text-slate-400 hover:text-white underline text-sm"
+            >
+              Continue as Guest
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div id="profile-modal" class="modal-container hidden">
+      <div class="modal-content w-11/12 max-w-sm">
+        <div class="p-6 space-y-4">
+          <h3 class="text-xl font-bold">User Profile</h3>
+          <div id="profile-info" class="text-sm space-y-1"></div>
+          <button
+            id="export-btn"
+            class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded"
+          >
+            Export Cloud Backup (.json)
+          </button>
+          <button
+            id="logout-btn"
+            class="w-full bg-slate-700 hover:bg-slate-600 text-white font-medium py-2 rounded"
+          >
+            Logout
+          </button>
+          <button
+            id="close-profile"
+            class="w-full bg-transparent border border-slate-600 text-slate-300 py-2 rounded"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/pocketbase@latest/dist/pocketbase.umd.js"></script>
+    <script type="module" src="/js/app.js"></script>
+  </body>
+</html>

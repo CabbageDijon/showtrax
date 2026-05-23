@@ -1,0 +1,149 @@
+/* Global Styles & Animations */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Fluid Grid for Show Cards */
+.shows-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .shows-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .shows-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+}
+
+@media (min-width: 1536px) {
+  .shows-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  } /* up to 6 cols */
+}
+
+/* Show Card */
+.show-card {
+  @apply bg-slate-800 rounded-xl overflow-hidden shadow-lg transition-transform hover:-translate-y-1 cursor-pointer;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+}
+
+.show-card img {
+  width: 100%;
+  aspect-ratio: 2/3;
+  object-fit: cover;
+  background: #1e293b;
+}
+
+.show-card .card-body {
+  padding: 0.75rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Modals */
+.modal-container {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-container.active {
+  display: flex;
+}
+
+/* Bottom Sheet (mobile) */
+@media (max-width: 767px) {
+  .modal-content {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-height: 90vh;
+    background: #1e293b;
+    border-radius: 1.5rem 1.5rem 0 0;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .modal-container.active .modal-content {
+    transform: translateY(0);
+  }
+}
+
+/* Lightbox (desktop) */
+@media (min-width: 768px) {
+  .modal-content {
+    max-width: 32rem;
+    width: 90%;
+    background: #1e293b;
+    border-radius: 1rem;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    transform: scale(0.95);
+    opacity: 0;
+    transition:
+      transform 0.2s ease,
+      opacity 0.2s ease;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+  .modal-container.active .modal-content {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Nav Buttons Active State */
+.nav-btn.active,
+.mobile-nav-btn.active {
+  @apply bg-indigo-600 text-white;
+}
+
+/* Scrollbar thin for recommendations */
+.scrollbar-thin::-webkit-scrollbar {
+  height: 6px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: #334155;
+  border-radius: 3px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #64748b;
+  border-radius: 3px;
+}
+
+/* Minimum touch target */
+button,
+.show-card,
+.nav-btn,
+.mobile-nav-btn {
+  min-width: 44px;
+  min-height: 44px;
+}

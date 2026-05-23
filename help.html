@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TV Tracker Pro – Architecture & DevOps</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-slate-900 text-slate-100 p-6 md:p-10 max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6">
+      📘 System Architecture & DevOps Manual
+    </h1>
+
+    <section class="mb-8">
+      <h2 class="text-2xl font-semibold mb-3">File Hierarchy Map</h2>
+      <pre class="bg-slate-800 p-4 rounded-lg text-sm overflow-x-auto">
+/ (project root)
+├── index.html          # Main SPA shell (Navbar, Dashboard, Discover, Docs views)
+├── help.html           # This page – architecture explanation
+├── css/
+│   └── styles.css      # Global styles, modal animations, safe‑area rules, grid fluidity
+├── js/
+│   ├── api.js          # ES module: TVmaze & Dailymotion API wrappers
+│   └── app.js          # Main app controller (routing, auth, watchlist, recommendations)
+├── Dockerfile           # Alpine Nginx image build
+├── nginx.conf           # Nginx static file serving with gzip
+└── README.md           # Deployment guide
+    </pre
+      >
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-2xl font-semibold mb-3">
+        Zero‑Idle Local Storage Strategy
+      </h2>
+      <p class="mb-2">
+        All user data resides exclusively in the browser’s
+        <code class="bg-slate-800 px-1 rounded">localStorage</code>. There is no
+        backend server and no persistent database process. This means:
+      </p>
+      <ul class="list-disc list-inside space-y-1 text-slate-300">
+        <li>
+          <strong>Zero RAM overhead</strong> – No server‑side session or
+          database daemon runs on the VPS.
+        </li>
+        <li>
+          User credentials, watchlists and preferences are stored per browser
+          and never transmitted to the server.
+        </li>
+        <li>
+          The system simulates a lightweight SQLite‑like store purely
+          client‑side using JSON serialisation.
+        </li>
+        <li>Guest users receive a random UUID to isolate their watchlist.</li>
+      </ul>
+      <p class="mt-2">
+        The “Export Cloud Backup” button creates a downloadable
+        <code>.json</code> file that can be manually uploaded to a Cloudflare R2
+        / S3 bucket, effectively offloading state from the tiny 18GB NVMe disk.
+      </p>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-2xl font-semibold mb-3">DevOps Decisions</h2>
+      <ul class="list-disc list-inside space-y-2 text-slate-300">
+        <li>
+          <strong>Nginx Alpine</strong> – Tiny footprint (~5 MB base), perfect
+          for 2GB RAM limit.
+        </li>
+        <li>
+          <strong>Vanilla JS + Tailwind CDN</strong> – Zero build step, no
+          node_modules, immediate delivery.
+        </li>
+        <li>
+          <strong>Gzip static compression</strong> – Enabled in nginx.conf to
+          minimise bandwidth.
+        </li>
+        <li>
+          <strong>Immutable static assets</strong> – All files are served
+          directly; no runtime writes.
+        </li>
+        <li>
+          <strong>Coolify deployment</strong> – Single Dockerfile, pull & run,
+          automatic health checks.
+        </li>
+      </ul>
+    </section>
+
+    <section>
+      <h2 class="text-2xl font-semibold mb-3">
+        Coolify Deployment Steps (Quick Reference)
+      </h2>
+      <ol class="list-decimal list-inside space-y-1 text-slate-300">
+        <li>Push the entire project folder to a Git repository.</li>
+        <li>In Coolify, create a new service → <strong>Dockerfile</strong>.</li>
+        <li>
+          Point to your repository and the branch containing the Dockerfile.
+        </li>
+        <li>Set the port to <code>80</code> (or map a custom domain).</li>
+        <li>Deploy – Coolify will build the image and start the container.</li>
+      </ol>
+    </section>
+  </body>
+</html>
