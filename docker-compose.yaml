@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile.nginx
     container_name: tvtracker-nginx
     ports:
-      - "80:80"
+      - "8080:80"          # ← changed to avoid port conflict
     restart: unless-stopped
     depends_on:
       - pocketbase
@@ -18,5 +18,5 @@ services:
     volumes:
       - ./pb_data:/pb_data
     environment:
-      - PB_ENCRYPTION_KEY=your-32-char-random-string-123   # change this!
+      - PB_ENCRYPTION_KEY=your-32-char-random-string-123
     restart: unless-stopped
