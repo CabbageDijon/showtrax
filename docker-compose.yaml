@@ -4,8 +4,7 @@ services:
   nginx:
     build: .
     container_name: tvtracker-nginx
-    ports:
-      - "80:80"
+    # Notice the "ports:" block has been completely removed here
     restart: unless-stopped
     depends_on:
       - pocketbase
@@ -14,11 +13,10 @@ services:
     image: ghcr.io/muchobien/pocketbase:latest
     container_name: tvtracker-pb
     volumes:
-      - pb_data:/pb_data               # <--- Removed the ./
+      - pb_data:/pb_data
     environment:
       - PB_ENCRYPTION_KEY=your-32-char-random-string-123
     restart: unless-stopped
 
-# Tell Docker to create a persistent named volume
 volumes:
-  pb_data:                             # <--- Added this block
+  pb_data:
