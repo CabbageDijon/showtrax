@@ -17,7 +17,7 @@ services:
       - pocketbase
 
   pocketbase:
-    image: pocketbase/pocketbase:latest
+    image: ghcr.io/muchobien/pocketbase:latest
     container_name: tvtracker-pb
     volumes:
       - ./pb_data:/pb_data # SQLite DB & uploaded files persist here
