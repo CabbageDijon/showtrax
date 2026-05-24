@@ -1,43 +1,18 @@
-version: '3.8'
-
+version: "3.8"
 services:
   nginx:
-    build:
-      context: .
-      dockerfile: Dockerfile.nginx
+    build: .
     container_name: tvtracker-nginx
     restart: unless-stopped
     depends_on:
       - pocketbase
-    networks:
-      - coolify
-    # Optional: Add healthcheck for Coolify
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
   pocketbase:
     image: ghcr.io/muchobien/pocketbase:latest
     container_name: tvtracker-pb
-    # Remove direct port exposure since nginx handles routing
-    # ports:
-    #   - "8090:8090"
     volumes:
-      - ./pb_data:/pb_data
+      - pb_data:/pb_data
     environment:
-      - PB_ENCRYPTION_KEY=your-32-char-random-string-123
-      - POCKETBASE_PUBLIC_URL=https://showtrax.duckdns.org
+      - PB_ENCRYPTION_KEY=[REDACTED_SECURE_KEY]
     restart: unless-stopped
-    networks:
-      - coolify
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "http://localhost:8090/api/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-networks:
-  coolify:
-    external: true
+volumes:
+  pb_data:
