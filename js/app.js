@@ -1,32 +1,25 @@
-/*********************************************
- * app.js – ShowTrax (Appwrite version)
- *********************************************/
-
 // ---------- Initialize Appwrite ----------
 const client = new Appwrite.Client()
-    .setEndpoint('https://appwrite.showtrax.duckdns.org/v1')   // your Appwrite endpoint
-    .setProject('YOUR_PROJECT_ID');                           // replace with your project ID
+    .setEndpoint('https://appwrite.showtrax.duckdns.org/v1')
+    .setProject('6a1379e5000fa6ee80fd'); // Replace with your actual project ID
 
 const account = new Appwrite.Account(client);
 const databases = new Appwrite.Databases(client);
 
-// ---------- Database & Collection IDs ----------
+// ---------- Database & Collection ----------
 const DB_ID = 'showtrax';
-const WATCHLIST_COLLECTION = 'watchlists';   // replace with exact collection ID from Appwrite
-const USERNAME_COLLECTION = 'usernames';    // replace with exact collection ID
+const WATCHLIST_COLLECTION = '6a137bfe000e58d6854f'; // Use your actual watchlist collection ID
 
 // ---------- Auth State ----------
 let currentUser = null;
 
-// On page load, check if a session exists
+// On page load
 (async function init() {
     try {
         currentUser = await account.get();
         console.log('Already logged in as', currentUser.email);
-        // Show dashboard / watchlist etc.
         showApp();
     } catch (err) {
-        // Not logged in – show auth forms
         showAuth();
     }
 })();
@@ -41,11 +34,11 @@ function showApp() {
     document.getElementById('authSection').style.display = 'none';
     document.getElementById('appSection').style.display = 'block';
     loadWatchlist();
+    loadUsername(); // Show username from prefs
 }
 
 // ---------- Auth Functions ----------
 
-// Sign Up (email + password + username)
 async function handleSignUp(e) {
     e.preventDefault();
     const email = document.getElementById('signupEmail').value.trim();
@@ -58,18 +51,13 @@ async function handleSignUp(e) {
     }
 
     try {
-        // 1. Create Appwrite account
+        // 1. Create the account
         const user = await account.create('unique()', email, password);
-
-        // 2. Store the username in a separate collection (document ID = user ID)
-        await databases.createDocument(DB_ID, USERNAME_COLLECTION, user.$id, {
-            user_id: user.$id,
-            username: username
-        });
-
-        // 3. Log the user in immediately
+        // 2. Save the username in user preferences (prefs)
+        await account.updatePrefs({ username: username });
+        // 3. Automatically log in
         await account.createEmailPasswordSession(email, password);
-        currentUser = user;
+        currentUser = await account.get();
         showApp();
     } catch (err) {
         console.error('Sign up failed:', err);
@@ -77,7 +65,6 @@ async function handleSignUp(e) {
     }
 }
 
-// Login
 async function handleLogin(e) {
     e.preventDefault();
     const email = document.getElementById('loginEmail').value.trim();
@@ -98,7 +85,6 @@ async function handleLogin(e) {
     }
 }
 
-// Logout
 async function handleLogout() {
     try {
         await account.deleteSession('current');
@@ -109,35 +95,41 @@ async function handleLogout() {
     }
 }
 
+// ---------- Username Display (from prefs) ----------
+async function loadUsername() {
+    if (!currentUser) return;
+    try {
+        const prefs = await account.getPrefs();
+        const username = prefs.username || currentUser.email;
+        document.getElementById('usernameDisplay').textContent = username;
+    } catch (err) {
+        console.error('Could not load username:', err);
+    }
+}
+
 // ---------- Watchlist Functions ----------
 
-// Load the current user’s watchlist
 async function loadWatchlist() {
     if (!currentUser) return;
-
     try {
         const response = await databases.listDocuments(
             DB_ID,
             WATCHLIST_COLLECTION,
             [Appwrite.Query.equal('user_id', currentUser.$id)]
         );
-        const watchlist = response.documents;
-        renderWatchlist(watchlist);
+        renderWatchlist(response.documents);
     } catch (err) {
         console.error('Failed to load watchlist:', err);
     }
 }
 
-// Render watchlist items to the DOM
 function renderWatchlist(watchlist) {
     const container = document.getElementById('watchlist');
     container.innerHTML = '';
-
     if (watchlist.length === 0) {
         container.innerHTML = '<p>Your watchlist is empty.</p>';
         return;
     }
-
     watchlist.forEach(item => {
         const div = document.createElement('div');
         div.className = 'watchlist-item';
@@ -149,16 +141,14 @@ function renderWatchlist(watchlist) {
     });
 }
 
-// Add a show to watchlist
 async function addToWatchlist(showId) {
     if (!currentUser) {
         alert('You must be logged in.');
         return;
     }
-
     try {
         await databases.createDocument(DB_ID, WATCHLIST_COLLECTION, 'unique()', {
-            showId: parseInt(showId),   // ensure integer
+            showId: parseInt(showId),
             user_id: currentUser.$id
         });
         loadWatchlist();
@@ -168,10 +158,8 @@ async function addToWatchlist(showId) {
     }
 }
 
-// Remove a show from watchlist
 async function removeFromWatchlist(documentId) {
     try {
-        // Optional: check ownership (here we just trust the user, but document security helps)
         await databases.deleteDocument(DB_ID, WATCHLIST_COLLECTION, documentId);
         loadWatchlist();
     } catch (err) {
