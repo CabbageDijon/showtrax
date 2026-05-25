@@ -1,18 +1,8 @@
-version: "3.8"
+version: '3.8'
 services:
   nginx:
     build: .
     container_name: tvtracker-nginx
     restart: unless-stopped
-    depends_on:
-      - pocketbase
-  pocketbase:
-    image: ghcr.io/muchobien/pocketbase:latest
-    container_name: tvtracker-pb
-    volumes:
-      - pb_data:/pb_data
-    environment:
-      - PB_ENCRYPTION_KEY=[REDACTED_SECURE_KEY]
-    restart: unless-stopped
-volumes:
-  pb_data:
+    # no depends_on needed
+volumes: {}
